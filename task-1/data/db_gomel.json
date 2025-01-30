@@ -1,0 +1,46 @@
+{
+  "users": [
+    {
+      "id": 3,
+      "name": "Alexey",
+      "secondName": "Smith8",
+      "sex": "MALE"
+    }
+  ],
+  "credits": [
+    {
+      "id": 3,
+      "userId": 3,
+      "date": "2012-01-20",
+      "period": "YEAR",
+      "money": 65000,
+      "rate": 10.8
+    }
+  ],
+  "discounts": [
+    {
+      "id": 3,
+      "type": "ONE",
+      "date": "2013-12-25",
+      "amount": 4.0
+    }
+  ],
+  "events": [
+    {
+      "id": 3,
+      "currency": "EUR",
+      "cost": 2.5,
+      "date": "2015-01-01"
+    }
+  ],
+  "transactions": [
+    {
+      "id": 3,
+      "date": "2015-06-20",
+      "userId": 3,
+      "creditId": 3,
+      "currency": "EUR",
+      "money": 1100
+    }
+  ]
+}
