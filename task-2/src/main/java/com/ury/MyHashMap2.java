@@ -119,6 +119,7 @@ public class MyHashMap2<K, V> {
 
             if (current instanceof TreeNode) {
                 ((TreeNode<K, V>) current).insert(key, value);
+                size++;
                 return;
             }
 

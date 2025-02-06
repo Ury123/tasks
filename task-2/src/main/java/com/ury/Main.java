@@ -19,6 +19,11 @@ public class Main {
             myHashMap2.put(k, i);
         }
 
+        System.out.println(myHashMap2.size());
+        System.out.println(myHashMap2.getOrDefault(500, 100));
+//       myHashMap2.remove(641);
+        myHashMap2.remove(1);
+        System.out.println(myHashMap2.size());
         System.out.println(myHashMap2.get(641));
     }
 }
