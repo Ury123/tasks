@@ -207,7 +207,7 @@ public class MyHashMap2<K, V> {
         if (value != null) {
             return value;
         } else {
-            return null;
+            return defaultValue;
         }
     }
 
