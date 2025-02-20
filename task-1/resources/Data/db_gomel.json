@@ -1,0 +1,46 @@
+{
+  "users": [
+    {
+      "id": 2,
+      "name": "Michael",
+      "secondName": "Brown",
+      "sex": "MALE"
+    }
+  ],
+  "credits": [
+    {
+      "id": 2,
+      "userId": 2,
+      "date": "2020-05-15",
+      "period": "MONTH",
+      "money": 30000,
+      "rate": 9.8
+    }
+  ],
+  "discounts": [
+    {
+      "id": 2,
+      "type": "ONE",
+      "date": "2020-12-25",
+      "amount": 4.0
+    }
+  ],
+  "events": [
+    {
+      "id": 2,
+      "currency": "EUR",
+      "cost": 2.3,
+      "date": "2020-06-01"
+    }
+  ],
+  "transactions": [
+    {
+      "id": 2,
+      "date": "2020-06-20",
+      "userId": 2,
+      "creditId": 2,
+      "currency": "USD",
+      "money": 500
+    }
+  ]
+}

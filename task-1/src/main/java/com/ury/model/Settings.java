@@ -3,14 +3,17 @@ package com.ury.model;
 import com.ury.model.enums.ShowForType;
 import com.ury.model.enums.SortBy;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Settings {
@@ -23,7 +26,8 @@ public class Settings {
     private BigDecimal startCostUSD;
     private ShowFor showFor;
 
-    @Data
+    @Getter
+    @Setter
     @NoArgsConstructor
     @AllArgsConstructor
     public static class ShowFor {

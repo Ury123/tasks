@@ -2,21 +2,23 @@ package com.ury.model;
 
 import com.ury.model.enums.Currency;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Transaction {
 
-    private int id;
+    private Integer id;
     private LocalDate date;
-    private int userId;
-    private int creditId;
+    private Integer userId;
+    private Integer creditId;
     private Currency currency;
     private BigDecimal money;
 }

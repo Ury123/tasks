@@ -1,10 +1,11 @@
-package com.ury.service;
+package com.ury.json;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.ury.adapter.LocalDateAdapter;
-import com.ury.model.Db;
+import com.ury.dto.DbDto;
 import com.ury.scanner.FileScanner;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -16,7 +17,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 public class JsonProcessor {
+
+    private static final String MAIN_DB_FILE = "db.json";
+
     private final Gson gson;
     private final FileScanner fileScanner;
 
@@ -28,33 +33,36 @@ public class JsonProcessor {
                 .create();
     }
 
-    public Db readDbFromFile(Path filePath) throws IOException {
+    public DbDto readDbFromFile(Path filePath) throws IOException {
+        log.info("Чтение файла базы данных: {}", filePath);
         try (FileReader reader = new FileReader(filePath.toFile())) {
-            return gson.fromJson(reader, Db.class);
+            return gson.fromJson(reader, DbDto.class);
         }
     }
 
-    public void writeDbToFile(Path filePath, Db db) throws IOException {
+    public void writeDbToFile(Path filePath, DbDto db) throws IOException {
+        log.info("Запись базы данных в файл: {}", filePath);
         try (FileWriter writer = new FileWriter(filePath.toFile())) {
             gson.toJson(db, writer);
         }
     }
 
     public void clearFile(Path filePath) throws IOException {
+        log.info("Очистка файла: {}", filePath);
         try (FileWriter writer = new FileWriter(filePath.toFile())) {
             writer.write("{}");
         }
     }
 
     public void processFiles(Path directory, List<String> useDepartments) throws IOException {
+        log.info("Начало обработки файлов в директории: {}", directory);
         List<Path> dbFiles;
 
         if (useDepartments == null) {
-
             dbFiles = fileScanner.findDbFiles(directory);
+            log.info("Обнаружены файлы: {}", dbFiles);
         } else if (useDepartments.isEmpty()) {
-
-            System.out.println("useDepartments пуст, файлы не будут обработаны.");
+            log.info("useDepartments пуст, файлы не будут обработаны.");
             return;
         } else {
 
@@ -65,23 +73,23 @@ public class JsonProcessor {
         }
 
         if (dbFiles.isEmpty()) {
-            System.out.println("Нет файлов для обработки.");
+            log.info("Нет файлов для обработки.");
             return;
         }
 
-        Path mainDbFilePath = directory.resolve("db.json");
-        Db mainDb;
+        Path mainDbFilePath = directory.resolve(MAIN_DB_FILE);
+        DbDto mainDb;
 
         if (Files.exists(mainDbFilePath)) {
             mainDb = readDbFromFile(mainDbFilePath);
         } else {
-            mainDb = new Db(new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
+            mainDb = new DbDto(new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
         }
 
         for (Path dbFile : dbFiles) {
-            System.out.println("Обрабатывается файл: " + dbFile.getFileName());
+            log.info("Обрабатывается файл: {}", dbFile.getFileName());
 
-            Db departmentDb = readDbFromFile(dbFile);
+            DbDto departmentDb = readDbFromFile(dbFile);
 
             mainDb.getUsers().addAll(departmentDb.getUsers());
             mainDb.getCredits().addAll(departmentDb.getCredits());
@@ -95,6 +103,6 @@ public class JsonProcessor {
 
         writeDbToFile(mainDbFilePath, mainDb);
 
-        System.out.println("Данные успешно обработаны и записаны в db.json.");
+        log.info("Данные успешно обработаны и записаны в db.json.");
     }
 }

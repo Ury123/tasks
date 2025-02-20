@@ -1,15 +1,19 @@
-package com.ury.model;
+package com.ury.dto;
 
+
+import com.ury.model.*;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Db {
+public class DbDto {
 
     private List<User> users;
     private List<Credit> credits;

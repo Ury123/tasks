@@ -1,20 +1,22 @@
 package com.ury.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreditReport {
+public class ReportDto {
 
-    private int creditId;
-    private int userId;
+    private Integer creditId;
+    private Integer userId;
     private String userName;
-    private int transactionCount;
+    private Integer transactionCount;
     private BigDecimal debt;
     private String period;
     private String status;

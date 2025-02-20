@@ -1,47 +1,48 @@
 package com.ury.report;
 
-import com.ury.dto.CreditReport;
-import com.ury.model.*;
-import com.ury.model.enums.Currency;
-import com.ury.model.enums.SortBy;
+import com.ury.dto.DbDto;
+import com.ury.dto.ReportDto;
+import com.ury.model.Credit;
+import com.ury.model.Settings;
+import com.ury.model.Transaction;
+import com.ury.model.User;
+import com.ury.print.CreditReportPrinter;
+import com.ury.map.CurrencyConverter;
+import com.ury.map.ReportDtoComparator;
 
 import java.math.BigDecimal;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
+
 
 public class CreditReporter {
 
+    private static final String STATUS_DONE = "DONE";
+    private static final String STATUS_IN_PROGRESS = "IN PROGRESS";
+
     private final Settings settings;
+    private final CreditReportPrinter creditReportPrinter;
+    private final CurrencyConverter currencyConverter;
+    private final ReportDtoComparator reportDtoComparator;
 
     public CreditReporter(Settings settings) {
         this.settings = settings;
+        this.creditReportPrinter = new CreditReportPrinter();
+        this.currencyConverter = new CurrencyConverter(settings);
+        this.reportDtoComparator = new ReportDtoComparator();
     }
 
-    public void printFormattedCredits(Db db) {
-        List<CreditReport> reports = db.getCredits().stream()
+    public void printFormattedCredits(DbDto db) {
+        List<ReportDto> reports = db.getCredits().stream()
                 .filter(credit -> filterByShowFor(credit, db))
                 .map(credit -> createCreditReport(credit, db))
-                .sorted(getComparator(settings.getSortBy()))
+                .sorted(reportDtoComparator.getComparator(settings.getSortBy()))
                 .toList();
 
-        System.out.printf("%-10s %-10s %-20s %-15s %-10s %-15s %-20s%n",
-                "Credit ID", "User ID", "Name", "Transactions", "Debt", "Period", "Status");
-
-        for (CreditReport report : reports) {
-            System.out.printf("%-10d %-10d %-20s %-15d %-10s %-15s %-20s%n",
-                    report.getCreditId(),
-                    Optional.ofNullable(report.getUserId()).orElse(null),
-                    Optional.ofNullable(report.getUserName()).orElse(""),
-                    report.getTransactionCount(),
-                    report.getDebt().toString(),
-                    Optional.ofNullable(report.getPeriod()).orElse(""),
-                    report.getStatus());
-        }
+        creditReportPrinter.printCredits(reports);
     }
 
-    private boolean filterByShowFor(Credit credit, Db db) {
+    private boolean filterByShowFor(Credit credit, DbDto db) {
         Settings.ShowFor showFor = settings.getShowFor();
         if (showFor == null) {
             return true;
@@ -49,23 +50,28 @@ public class CreditReporter {
 
         switch (showFor.getType()) {
             case ID:
-                return showFor.getUsers().contains(String.valueOf(credit.getUserId()));
+                return filterById(credit, showFor);
             case NAME:
-                User user = db.getUsers().stream()
-                        .filter(u -> u.getId() == credit.getUserId())
-                        .findFirst()
-                        .orElse(null);
-                if (user == null) {
-                    return false;
-                }
-                String fullName = user.getName() + " " + user.getSecondName();
-                return showFor.getUsers().contains(fullName);
+                return filterByName(credit, db, showFor);
             default:
                 return false;
         }
     }
 
-    private CreditReport createCreditReport(Credit credit, Db db) {
+    private boolean filterById(Credit credit, Settings.ShowFor showFor) {
+        return showFor.getUsers().contains(String.valueOf(credit.getUserId()));
+    }
+
+    private boolean filterByName(Credit credit, DbDto db, Settings.ShowFor showFor) {
+        return db.getUsers().stream()
+                .filter(u -> u.getId() == credit.getUserId())
+                .findFirst()
+                .map(user -> user.getName() + " " + user.getSecondName())
+                .map(showFor.getUsers()::contains)
+                .orElse(false);
+    }
+
+    private ReportDto createCreditReport(Credit credit, DbDto db) {
         User user = db.getUsers().stream()
                 .filter(u -> u.getId() == credit.getUserId())
                 .findFirst()
@@ -76,12 +82,12 @@ public class CreditReporter {
                 .collect(Collectors.toList());
 
         BigDecimal totalDebt = transactions.stream()
-                .map(t -> convertToRUB(t.getMoney(), t.getCurrency()))
+                .map(t -> currencyConverter.convertToRUB(t.getMoney(), t.getCurrency()))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        String status = totalDebt.compareTo(BigDecimal.ZERO) == 0 ? "DONE" : "IN PROGRESS";
+        String status = totalDebt.compareTo(BigDecimal.ZERO) == 0 ? STATUS_DONE : STATUS_IN_PROGRESS;
 
-        return new CreditReport(
+        return new ReportDto(
                 credit.getId(),
                 credit.getUserId(),
                 user != null ? user.getName() + " " + user.getSecondName() : null,
@@ -90,29 +96,5 @@ public class CreditReporter {
                 credit.getPeriod().toString(),
                 status
         );
-    }
-
-    private BigDecimal convertToRUB(BigDecimal amount, Currency currency) {
-        switch (currency) {
-            case EUR:
-                return amount.multiply(settings.getStartCostEUR());
-            case USD:
-                return amount.multiply(settings.getStartCostUSD());
-            case RUB:
-                return amount;
-            default:
-                throw new IllegalArgumentException("Неверная валюта: " + currency);
-        }
-    }
-
-    private Comparator<CreditReport> getComparator(SortBy sortParameter) {
-        switch (sortParameter) {
-            case NAME:
-                return Comparator.comparing(CreditReport::getUserName, Comparator.nullsFirst(Comparator.naturalOrder()));
-            case DEBT:
-                return Comparator.comparing(CreditReport::getDebt);
-            default:
-                return Comparator.comparing(CreditReport::getCreditId);
-        }
     }
 }
