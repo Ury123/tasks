@@ -176,7 +176,7 @@ public class MyHashMap2<K, V> {
     public void remove(K key) {
         int index = hash(key);
         AbstractNode<K, V> current = buckets[index];
-        Node<K, V> prev = null;
+        Node<K, V> prev = null;                             //////
 
         if (current instanceof TreeNode) {
             TreeNode<K, V> treeNode = ((TreeNode<K, V>) current);
@@ -185,7 +185,6 @@ public class MyHashMap2<K, V> {
                 target.value = null;
                 size--;
             }
-            return;
         } else {
             while(current != null) {
                 if (current.key.equals(key)) {
