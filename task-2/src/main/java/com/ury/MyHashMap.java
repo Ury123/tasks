@@ -40,11 +40,9 @@ public class MyHashMap<K, V> {
     public void put(K key, V value) {
         int index;
 
-        if (isKeyNull(key)) {
-            index = 0;
-        } else {
-            index = hash(key);
-        }
+        resize();
+
+        index = indexOf(hash(key));
 
         Node<K, V> node = new Node<>(key, value);
 
@@ -53,7 +51,12 @@ public class MyHashMap<K, V> {
         } else {
             Node<K, V> current = buckets[index];
             while (true) {
-                if (current.key.equals(key)) {
+                if (key == null) {
+                    if (current.key == null) {
+                        current.value = value;
+                        return;
+                    }
+                } else if (current.key.equals(key)) {
                     current.value = value;
                     return;
                 }
@@ -67,17 +70,18 @@ public class MyHashMap<K, V> {
 
         size++;
 
-        if (size / buckets.length > loadFactor) {
-            resize();
-        }
     }
 
     public V get(K key) {
-        int index = hash(key);
+        int index = indexOf(hash(key));
         Node<K, V> current = buckets[index];
 
         while (current != null) {
-            if (current.key.equals(key)) {
+            if (key == null) {
+                if (current.key == null) {
+                    return current.value;
+                }
+            } else if (current.key.equals(key)) {
                 return current.value;
             }
             current = current.next;
@@ -86,12 +90,22 @@ public class MyHashMap<K, V> {
     }
 
     public void remove(K key) {
-        int index = hash(key);
+        int index = indexOf(hash(key));
         Node<K, V> current = buckets[index];
         Node<K, V> prev = null;
 
         while(current != null) {
-            if (current.key.equals(key)) {
+            if (key == null) {
+                if (current.key == null) {
+                    if (prev == null) {
+                        buckets[index] = current.next;
+                    } else {
+                        prev.next = current.next;
+                    }
+                    size--;
+                    return;
+                }
+            } else if (current.key.equals(key)) {
                 if (prev == null) {
                     buckets[index] = current.next;
                 } else {
@@ -106,7 +120,7 @@ public class MyHashMap<K, V> {
     }
 
     public V getOrDefault(K key, V defaultValue) {
-        int index = hash(key);
+        int index = indexOf(hash(key));
         Node<K, V> current = buckets[index];
 
         while (current != null) {
@@ -118,23 +132,34 @@ public class MyHashMap<K, V> {
         return defaultValue;
     }
 
-    private boolean isKeyNull(K key) {
-        return key == null;
+    private int hash(K key) {
+        int h;
+        return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
     }
 
-    private int hash(K key) {
-        return key.hashCode() % buckets.length;
+    private int indexOf(int hash) {
+        return hash % buckets.length;
     }
 
     private void resize() {
-        Node<K, V>[] oldBuckets = buckets;
-        buckets = new Node[oldBuckets.length * 2];
-        size = 0;
 
-        for (Node<K, V> node : oldBuckets) {
-            while (node != null) {
-                put(node.key, node.value);
-                node = node.next;
+        int count = 0;
+        for (int i = 0; i < buckets.length; i++) {
+            if (buckets[i] != null) {
+                count++;
+            }
+        }
+
+        if (count / buckets.length > loadFactor) {
+            Node<K, V>[] oldBuckets = buckets;
+            buckets = new Node[oldBuckets.length * 2];
+            size = 0;
+
+            for (Node<K, V> node : oldBuckets) {
+                while (node != null) {
+                    put(node.key, node.value);
+                    node = node.next;
+                }
             }
         }
     }
