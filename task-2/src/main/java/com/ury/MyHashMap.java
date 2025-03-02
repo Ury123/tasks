@@ -38,11 +38,10 @@ public class MyHashMap<K, V> {
     }
 
     public void put(K key, V value) {
-        int index;
 
         resize();
 
-        index = indexOf(hash(key));
+        int index = indexOf(hash(key));
 
         Node<K, V> node = new Node<>(key, value);
 
@@ -73,6 +72,7 @@ public class MyHashMap<K, V> {
     }
 
     public V get(K key) {
+
         int index = indexOf(hash(key));
         Node<K, V> current = buckets[index];
 
@@ -87,9 +87,18 @@ public class MyHashMap<K, V> {
             current = current.next;
         }
         return null;
+
+    }
+
+    public V getOrDefault(K key, V defaultValue) {
+
+        V value = get(key);
+        return value != null ? value : defaultValue;
+
     }
 
     public void remove(K key) {
+
         int index = indexOf(hash(key));
         Node<K, V> current = buckets[index];
         Node<K, V> prev = null;
@@ -117,24 +126,14 @@ public class MyHashMap<K, V> {
             prev = current;
             current = current.next;
         }
-    }
 
-    public V getOrDefault(K key, V defaultValue) {
-        int index = indexOf(hash(key));
-        Node<K, V> current = buckets[index];
-
-        while (current != null) {
-            if (current.key.equals(key)) {
-                return current.value;
-            }
-            current = current.next;
-        }
-        return defaultValue;
     }
 
     private int hash(K key) {
+
         int h;
         return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
+
     }
 
     private int indexOf(int hash) {
@@ -162,6 +161,7 @@ public class MyHashMap<K, V> {
                 }
             }
         }
+
     }
 
 }

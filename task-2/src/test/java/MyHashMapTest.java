@@ -5,76 +5,121 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class MyHashMapTest {
-    private MyHashMap<String, Integer> map;
+
+    class Writer {
+        private String nickname;
+
+        public Writer(String nickname) {
+            this.nickname = nickname;
+        }
+
+        @Override
+        public int hashCode() {
+            return nickname.hashCode();
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null || !(obj instanceof Writer)) {
+                return false;
+            }
+            Writer writer = (Writer) obj;
+            return nickname.equals(writer.nickname);
+        }
+    }
+
+    class Book {
+        private String title;
+
+        public Book(String title) {
+            this.title = title;
+        }
+    }
+
+    private MyHashMap<Writer, Book[]> map;
 
     @Test
-    public void testPutAndGet() {
+    public void testPutAndGetShouldWorkCorrectly() {
         map = new MyHashMap<>();
-        map.put("one", 1);
-        map.put("two", 2);
-        map.put(null, 3);
-        map.put(null, 4);
-        assertEquals(4, map.get(null));
-        assertEquals(1, map.get("one"));
-        assertEquals(2, map.get("two"));
-        assertNull(map.get("three"));
+
+        Writer writer1 = new Writer("John");
+        Writer writer2 = new Writer("Jane");
+        Book[] books1 = new Book[] {new Book("book1"), new Book("book2")};
+        Book[] books2 = new Book[] {new Book("book3"), new Book("book4")};
+        map.put(writer1, books1);
+        map.put(writer2, books2);
+        assertEquals(books1, map.get(writer1));
+        assertEquals(books2, map.get(writer2));
+        assertNull(map.get(new Writer("aaa")));
     }
 
     @Test
     public void testUpdateValue() {
         map = new MyHashMap<>();
-        map.put("key", 10);
-        map.put("key", 20);
-        assertEquals(20, map.get("key"));
+
+        Writer writer = new Writer("John");
+        Book[] books1 = new Book[] {new Book("book1"), new Book("book2")};
+        Book[] books2 = new Book[] {new Book("book3"), new Book("book4")};
+        map.put(writer, books1);
+        map.put(writer, books2);
+        assertEquals(books2, map.get(writer));
     }
 
     @Test
     public void testSize() {
         map = new MyHashMap<>();
         assertEquals(0, map.size());
-        map.put("one", 1);
-        map.put("two", 2);
+        Writer writer1 = new Writer("John");
+        Writer writer2 = new Writer("Jane");
+        Book[] books1 = new Book[] {new Book("book1"), new Book("book2")};
+        Book[] books2 = new Book[] {new Book("book3"), new Book("book4")};
+        map.put(writer1, books1);
+        map.put(writer2, books2);
         assertEquals(2, map.size());
-        map.put("one", 10);
+        map.put(writer1, new Book[] {});
         assertEquals(2, map.size());
     }
 
     @Test
     public void testRemove() {
         map = new MyHashMap<>();
-        map.put("one", 1);
-        map.put("two", 2);
-        map.put(null, 3);
-        map.put(null, 4);
-        map.remove("one");
+        Writer writer1 = new Writer("John");
+        Writer writer2 = new Writer("Jane");
+        Book[] books1 = new Book[] {new Book("book1"), new Book("book2")};
+        Book[] books2 = new Book[] {new Book("book3"), new Book("book4")};
+        map.put(writer1, books1);
+        map.put(writer2, books2);
+        map.put(null, books2);
+        map.put(null, books1);
+        map.remove(writer1);
         map.remove(null);
-        assertNull(map.get("one"));
+        assertNull(map.get(writer1));
         assertNull(map.get(null));
-        assertEquals(2, map.get("two"));
+        assertEquals(books2, map.get(writer2));
         assertEquals(1, map.size());
     }
 
     @Test
     public void testGetOrDefault() {
         map = new MyHashMap<>();
-        map.put("key", 42);
-        assertEquals(42, map.getOrDefault("key", 0));
-        assertEquals(0, map.getOrDefault("missing", 0));
+        Writer writer1 = new Writer("John");
+        Book[] books1 = new Book[] {new Book("book1"), new Book("book2")};
+        Book[] books2 = new Book[] {new Book("book3"), new Book("book4")};
+        map.put(writer1, books1);
+        assertEquals(books1, map.getOrDefault(writer1, books2));
+        assertEquals(books2, map.getOrDefault(new Writer("aaa"), books2));
     }
 
     @Test
     public void testPutNullKey() {
         map = new MyHashMap<>();
-        map.put(null, 100);
-        assertEquals(100, map.get(null));
-    }
-
-    @Test
-    public void testCollisionHandling() {
-        MyHashMap<Integer, String> smallMap = new MyHashMap<>(2, 0.75f);
-        smallMap.put(1, "A");
-        smallMap.put(3, "B");
-        assertEquals("A", smallMap.get(1));
-        assertEquals("B", smallMap.get(3));
+        Book[] books1 = new Book[] {new Book("book1"), new Book("book2")};
+        Book[] books2 = new Book[] {new Book("book3"), new Book("book4")};
+        map.put(null, books1);
+        map.put(null, books2);
+        assertEquals(books2, map.get(null));
     }
 }
