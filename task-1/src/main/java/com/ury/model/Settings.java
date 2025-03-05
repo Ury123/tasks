@@ -1,6 +1,5 @@
 package com.ury.model;
 
-import com.ury.model.enums.ShowForType;
 import com.ury.model.enums.SortBy;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -25,13 +24,4 @@ public class Settings {
     private BigDecimal startCostEUR;
     private BigDecimal startCostUSD;
     private ShowFor showFor;
-
-    @Getter
-    @Setter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class ShowFor {
-        private ShowForType type;
-        private List<String> users;
-    }
 }

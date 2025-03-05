@@ -4,6 +4,7 @@ import com.ury.dto.DbDto;
 import com.ury.dto.ReportDto;
 import com.ury.model.Credit;
 import com.ury.model.Settings;
+import com.ury.model.ShowFor;
 import com.ury.model.Transaction;
 import com.ury.model.User;
 import com.ury.print.CreditReportPrinter;
@@ -43,7 +44,7 @@ public class CreditReporter {
     }
 
     private boolean filterByShowFor(Credit credit, DbDto db) {
-        Settings.ShowFor showFor = settings.getShowFor();
+        ShowFor showFor = settings.getShowFor();
         if (showFor == null) {
             return true;
         }
@@ -58,23 +59,23 @@ public class CreditReporter {
         }
     }
 
-    private boolean filterById(Credit credit, Settings.ShowFor showFor) {
+    private boolean filterById(Credit credit, ShowFor showFor) {
         return showFor.getUsers().contains(String.valueOf(credit.getUserId()));
     }
 
-    private boolean filterByName(Credit credit, DbDto db, Settings.ShowFor showFor) {
+    private boolean filterByName(Credit credit, DbDto db, ShowFor showFor) {
         return db.getUsers().stream()
                 .filter(u -> u.getId() == credit.getUserId())
-                .findFirst()
-                .map(user -> user.getName() + " " + user.getSecondName())
-                .map(showFor.getUsers()::contains)
-                .orElse(false);
+                .map(u -> u.getName() + " " + u.getSecondName())
+                .anyMatch(showFor.getUsers()::contains);
     }
 
     private ReportDto createCreditReport(Credit credit, DbDto db) {
-        User user = db.getUsers().stream()
+
+        String userName = db.getUsers().stream()
                 .filter(u -> u.getId() == credit.getUserId())
                 .findFirst()
+                .map(user -> user.getName() + " " + user.getSecondName())
                 .orElse(null);
 
         List<Transaction> transactions = db.getTransactions().stream()
@@ -87,14 +88,14 @@ public class CreditReporter {
 
         String status = totalDebt.compareTo(BigDecimal.ZERO) == 0 ? STATUS_DONE : STATUS_IN_PROGRESS;
 
-        return new ReportDto(
-                credit.getId(),
-                credit.getUserId(),
-                user != null ? user.getName() + " " + user.getSecondName() : null,
-                transactions.size(),
-                totalDebt,
-                credit.getPeriod().toString(),
-                status
-        );
+        return ReportDto.builder()
+                .creditId(credit.getId())
+                .userId(credit.getUserId())
+                .userName(userName)
+                .transactionCount(transactions.size())
+                .debt(totalDebt)
+                .period(credit.getPeriod().toString())
+                .status(status)
+                .build();
     }
 }

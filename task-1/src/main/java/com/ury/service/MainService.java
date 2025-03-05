@@ -1,7 +1,8 @@
 package com.ury.service;
 
 import com.ury.dto.DbDto;
-import com.ury.json.JsonProcessor;
+import com.ury.exceptions.FileProcessingException;
+import com.ury.json.JsonProcessorImpl;
 import com.ury.model.Settings;
 import com.ury.reader.SettingsReader;
 import com.ury.report.CreditReporter;
@@ -37,19 +38,20 @@ public class MainService {
 
         List<String> useDepartments = settings.getUseDepartments();
 
-        JsonProcessor jsonProcessor = new JsonProcessor(fileScanner);
+        JsonProcessorImpl jsonProcessorImpl = new JsonProcessorImpl(fileScanner);
 
         try {
             if (fileScanner.validateRequiredFiles(dataDirectory)) {
                 log.info("Начало обработки файлов");
-                jsonProcessor.processFiles(dataDirectory, useDepartments);
+                jsonProcessorImpl.processFiles(dataDirectory, useDepartments);
                 log.info("Файлы успешно обработаны.");
             }
         } catch (IOException e) {
             log.error("Произошла ошибка при обработке файлов: {}", e.getMessage(), e);
+            throw new FileProcessingException("Ошибка при обработке файлов", e);
         }
 
-        DbDto mainDb = jsonProcessor.readDbFromFile(Path.of("task-1/resources/Data/db.json"));
+        DbDto mainDb = jsonProcessorImpl.readDbFromFile(Path.of("task-1/resources/Data/db.json"));
         CreditReporter creditReporter = new CreditReporter(settings);
         creditReporter.printFormattedCredits(mainDb);
     }
