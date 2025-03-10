@@ -1,7 +1,11 @@
 package com.ury.dto;
 
 
-import com.ury.model.*;
+import com.ury.model.Credit;
+import com.ury.model.Discount;
+import com.ury.model.Event;
+import com.ury.model.Transaction;
+import com.ury.model.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

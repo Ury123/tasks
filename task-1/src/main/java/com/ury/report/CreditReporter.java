@@ -13,6 +13,7 @@ import com.ury.map.ReportDtoComparator;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 
@@ -65,7 +66,7 @@ public class CreditReporter {
 
     private boolean filterByName(Credit credit, DbDto db, ShowFor showFor) {
         return db.getUsers().stream()
-                .filter(u -> u.getId() == credit.getUserId())
+                .filter(u -> Objects.equals(u.getId(), credit.getUserId()))
                 .map(u -> u.getName() + " " + u.getSecondName())
                 .anyMatch(showFor.getUsers()::contains);
     }
@@ -73,14 +74,14 @@ public class CreditReporter {
     private ReportDto createCreditReport(Credit credit, DbDto db) {
 
         String userName = db.getUsers().stream()
-                .filter(u -> u.getId() == credit.getUserId())
+                .filter(u -> Objects.equals(u.getId(), credit.getUserId()))
                 .findFirst()
                 .map(user -> user.getName() + " " + user.getSecondName())
                 .orElse(null);
 
         List<Transaction> transactions = db.getTransactions().stream()
-                .filter(t -> t.getCreditId() == credit.getId())
-                .collect(Collectors.toList());
+                .filter(t -> Objects.equals(t.getCreditId(), credit.getId()))
+                .toList();
 
         BigDecimal totalDebt = transactions.stream()
                 .map(t -> currencyConverter.convertToRUB(t.getMoney(), t.getCurrency()))
