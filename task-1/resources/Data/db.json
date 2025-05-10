@@ -1,0 +1,115 @@
+{
+  "users": [
+    {
+      "id": 0,
+      "name": "Alex",
+      "secondName": "Smith",
+      "sex": "MALE"
+    },
+    {
+      "id": 1,
+      "name": "Jane",
+      "secondName": "Doe",
+      "sex": "FEMALE"
+    },
+    {
+      "id": 2,
+      "name": "Michael",
+      "secondName": "Brown",
+      "sex": "MALE"
+    }
+  ],
+  "credits": [
+    {
+      "id": 0,
+      "userId": 0,
+      "date": "2011-01-20",
+      "period": "YEAR",
+      "money": 75000,
+      "rate": 10.6
+    },
+    {
+      "id": 1,
+      "userId": 1,
+      "date": "2015-06-10",
+      "period": "MONTH",
+      "money": 50000,
+      "rate": 12.5
+    },
+    {
+      "id": 2,
+      "userId": 2,
+      "date": "2020-05-15",
+      "period": "MONTH",
+      "money": 30000,
+      "rate": 9.8
+    }
+  ],
+  "discounts": [
+    {
+      "id": 0,
+      "type": "ONE",
+      "date": "2014-12-25",
+      "amount": 5.0
+    },
+    {
+      "id": 1,
+      "type": "MANY",
+      "dateFrom": "2015-01-01",
+      "dateTo": "2015-12-31",
+      "amount": 2.5
+    },
+    {
+      "id": 2,
+      "type": "ONE",
+      "date": "2020-12-25",
+      "amount": 4.0
+    }
+  ],
+  "events": [
+    {
+      "id": 0,
+      "currency": "EUR",
+      "cost": 2.5,
+      "date": "2015-01-01"
+    },
+    {
+      "id": 1,
+      "currency": "USD",
+      "cost": 2.1,
+      "date": "2015-02-01"
+    },
+    {
+      "id": 2,
+      "currency": "EUR",
+      "cost": 2.3,
+      "date": "2020-06-01"
+    }
+  ],
+  "transactions": [
+    {
+      "id": 0,
+      "date": "2015-06-20",
+      "userId": 1,
+      "creditId": 1,
+      "currency": "EUR",
+      "money": 1000
+    },
+    {
+      "id": 1,
+      "date": "2015-07-01",
+      "userId": 1,
+      "creditId": 1,
+      "currency": "USD",
+      "money": 2000
+    },
+    {
+      "id": 2,
+      "date": "2020-06-20",
+      "userId": 2,
+      "creditId": 2,
+      "currency": "USD",
+      "money": 500
+    }
+  ]
+}

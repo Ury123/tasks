@@ -1,0 +1,15 @@
+{
+  "dateFrom": "2010-04-06",
+  "dateTo": "2015-07-06",
+  "showFor": {
+    "type": "NAME",
+    "users": ["Jane Doe", "Michael Brown"]
+  },
+  "sortBy": "DEBT",
+  "useDepartments": [
+    "gomel",
+    "minsk"
+  ],
+  "startCostEUR": 2.4,
+  "startCostUSD": 2.1
+}
